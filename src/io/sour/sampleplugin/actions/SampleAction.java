@@ -1,7 +1,6 @@
 package io.sour.sampleplugin.actions;
 
 import java.io.InputStream;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -14,6 +13,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
+import java.util.*;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -41,6 +41,9 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 
 
 		String message = "&&&&&&&&&&";
+		String message2 = "##########";
+		StringBuilder message3 = new StringBuilder();
+		boolean flag = false;
 		IEditorPart editor = window.getActivePage().getActiveEditor();
 		if (editor == null) {
 			MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
@@ -49,13 +52,46 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	    ITextEditor ite = (ITextEditor)editor;
 	    IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
 	    message = doc.get();
+	    if(message.contains(" @Override\n" + 
+	    		"		    public void checkClientTrusted(X509Certificate[] certs, String authType) {\n" + 
+	    		"		    }\n" + 
+	    		"\n" + 
+	    		"		    @Override\n" + 
+	    		"		    public void checkServerTrusted(X509Certificate[] certs, String authType) {\n" + 
+	    		"		    }"))
+	    {
+	    		message2 = "Found it!!";
+		    Scanner sc = new Scanner(message);
+		    while(sc.hasNextLine())
+		    {
+		      String line = sc.nextLine();
+		      // process the line
+		      if(line.trim().startsWith("TrustManager[]"))
+		      {
+		    	  	flag = true;
+		      }
+		      if(flag == true)
+		      {
+		    	  	message3.append(line);
+		      }
+		      if(line.endsWith("};"))
+		      {
+		    	  	flag = false;
+		      }
+		    }
+		    sc.close();
+	    }
+	
 		//message += "\n" + b;
 		//message += "\n" + c;
 		//message += "\n" + d;
 		MessageDialog.openInformation(
 			window.getShell(),
 			"Sampleplugin",
-			"Hello, Eclipse world" + message);
+			"Hello, Eclipse world" + message + "\n" + message2+ "\n" + message3);
+		
+		
+		
 	}
 
 	/**
