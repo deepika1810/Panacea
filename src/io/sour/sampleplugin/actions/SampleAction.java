@@ -10,6 +10,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import io.sour.sampleplugin.database.CodeDatabase;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
@@ -81,6 +84,10 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 		    }
 		    sc.close();
 	    }
+	    
+	    String message4 = "\n\n^^^$$$$$$$$$$^^^\n\n";
+	    
+	    message4 += CodeDatabase.compareSnippet(message3.toString()) ? "DATABASE MATCH" : "NO MATCH FOUND IN DATABASE";
 	
 		//message += "\n" + b;
 		//message += "\n" + c;
@@ -88,7 +95,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 		MessageDialog.openInformation(
 			window.getShell(),
 			"Sampleplugin",
-			"Hello, Eclipse world" + message + "\n" + message2+ "\n" + message3);
+			"Hello, Eclipse world" + "\n" + message2+ "\n" + message3 + "\n" + message4);
 		
 		
 		
