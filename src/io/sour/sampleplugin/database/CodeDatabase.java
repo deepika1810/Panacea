@@ -6,10 +6,12 @@ import org.apache.poi.ss.usermodel.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -254,21 +256,80 @@ public class CodeDatabase
 				
 	    		    
             }
-	});
-	try 
-    	{
-		for( Integer i:row_code.keySet())
-		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("/Users/deepikamulchandani/Downloads/DevCode"+i+".java")));
-			writer.write(row_code.get(i).toString());
-			writer.close();
-		}
+		});
+		try 
+    		{
+			for( Integer i:row_code.keySet())
+			{
+				BufferedWriter writer = new BufferedWriter(new FileWriter(new File("/Users/deepikamulchandani/Downloads/DevCode"+i+".java")));
+				writer.write(row_code.get(i).toString());
+				writer.close();
+			}
 		
-	} 
-	catch (IOException e) 
-	{
+    		} 
+		catch (IOException e) 
+		{	
 				// TODO Auto-generated catch block
-		e.printStackTrace();
+			e.printStackTrace();
+		}
+		sheet.forEach(row -> {
+			if(row_code.containsKey(row.getRowNum()))
+			{
+				
+				Cell javafileid = row.getCell(2);
+				String javafileidValue = dataFormatter.formatCellValue(javafileid);
+				String filename = FindFile(javafileidValue);
+				System.out.println("HELLO FROM AST from outside");
+				System.out.println(filename);
+				String output;
+				if(!filename.equals("null"))
+				{
+					//Executing gumtree
+				//	/Users/deepikamulchandani/gumtree/dist/build/distributions/gumtree/bin/gumtree diff /Users/deepikamulchandani/Desktop/WM/Walmart_DeepikaM/MovieTheaterDesign.java /Users/deepikamulchandani/Desktop/WM/MovieTheaterDesign.java
+					System.out.println("HELLO FROM AST");
+					Runtime r = Runtime.getRuntime();
+				    Process p;
+				    BufferedReader is;
+				    try 
+				    {
+						p = r.exec("/Users/deepikamulchandani/gumtree/dist/build/distributions/gumtree/bin/gumtree diff /Users/deepikamulchandani/Downloads/answers/"+filename+" /Users/deepikamulchandani/Downloads/DevCode"+row.getRowNum()+".java");
+						is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+						while ((output = is.readLine()) != null)
+						{
+							System.out.println(output);
+						}
+					} 
+				    catch (IOException e) 
+				    {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+				
+			}	
+			
+		});
+		
+		
 	}
-	}	
+	
+	public static String FindFile(String filename) 
+	{
+		File folder = new File("/Users/deepikamulchandani/Downloads/answers/");
+		File[] listOfFiles = folder.listFiles();
+		String result = "null";
+		 for (int i = 0; i < listOfFiles.length; i++) 
+		 {
+			 //String temp = listOfFiles[i].getName().substring(7,7+filename.length()-1);
+			 //System.out.println(temp);
+			 if(listOfFiles[i].getName().contains(filename))
+				  result = listOfFiles[i].getName();
+		 }
+		 return result;
+	}
+	
+	
+	
+	
 }
