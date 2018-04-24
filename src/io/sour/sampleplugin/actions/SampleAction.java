@@ -1,6 +1,11 @@
 package io.sour.sampleplugin.actions;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -40,28 +45,21 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 * in the workbench UI.
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
-	public void run(IAction action) {
-
-
-		String message = "&&&&&&&&&&";
-		String message2 = "##########";
-		StringBuilder message3 = new StringBuilder();
-		boolean flag = false;
-		IEditorPart editor = window.getActivePage().getActiveEditor();
-		if (editor == null) {
-			MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
-			return;
-		}
-	    ITextEditor ite = (ITextEditor)editor;
-	    IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
-	    message = doc.get();
-	    if(message.contains(" @Override\n" + 
-	    		"		    public void checkClientTrusted(X509Certificate[] certs, String authType) {\n" + 
-	    		"		    }\n" + 
-	    		"\n" + 
-	    		"		    @Override\n" + 
-	    		"		    public void checkServerTrusted(X509Certificate[] certs, String authType) {\n" + 
-	    		"		    }"))
+	public void run(IAction action) 
+	{
+		//String message = "&&&&&&&&&&";
+		//String message2 = "##########";
+		//StringBuilder message3 = new StringBuilder();
+		//boolean flag = false;
+		//IEditorPart editor = window.getActivePage().getActiveEditor();
+		//if (editor == null) {
+		//	MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
+		//	return;
+		//}
+	    //ITextEditor ite = (ITextEditor)editor;
+	    //IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
+	    //message = doc.get();
+	    /*if(message.contains("TrustManager"))
 	    {
 	    		message2 = "Found it!!";
 		    Scanner sc = new Scanner(message);
@@ -87,7 +85,12 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	    
 	    String message4 = "\n\n^^^$$$$$$$$$$^^^\n\n";
 	    
-	    message4 += CodeDatabase.compareSnippet(message3.toString()) ? "DATABASE MATCH" : "NO MATCH FOUND IN DATABASE";
+	    try {
+			message4 += CodeDatabase.compareSnippet(message3.toString()) ? "DATABASE MATCH" : "NO MATCH FOUND IN DATABASE";
+		} catch (InvalidFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 		//message += "\n" + b;
 		//message += "\n" + c;
@@ -96,9 +99,54 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			window.getShell(),
 			"Sampleplugin",
 			"Hello, Eclipse world" + "\n" + message2+ "\n" + message3 + "\n" + message4);
+		*/
+		// -------------------------EDITED BY DEEPIKA------------------------------
 		
-		
-		
+		File file = new File("/Users/deepikamulchandani/Downloads/Keywords");
+		String code;
+		String keyword;
+		String message = "Welcome to Automatic Security Bug Fix Plugin!";
+		String message2 = " ";
+		IEditorPart editor = window.getActivePage().getActiveEditor();
+		if (editor == null) {
+			MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
+			return;
+		}
+		try 
+		{
+			Scanner sc = new Scanner(file);
+			while(sc.hasNextLine())
+			{
+				keyword = sc.next();
+				ITextEditor ite = (ITextEditor)editor;
+			    IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
+			    code = doc.get();
+			    if(code.contains(keyword))
+			    {
+			    	 try 
+			    	 {
+			    		 	 message2 = CodeDatabase.compareSnippet(code,keyword);
+			    		 	CodeDatabase.compareSnippetAST(code,keyword);
+			    	 }
+			    	 catch(InvalidFormatException | IOException e) 
+			    	 {
+			 			// TODO Auto-generated catch block
+			 			e.printStackTrace();
+			 	 }
+			    	 
+			    }
+			    
+			}
+		} 
+		catch (FileNotFoundException e) 
+		{
+			e.printStackTrace();
+		}
+			
+		MessageDialog.openInformation(
+				window.getShell(),
+				"Security Issue Plugin",
+				 message+ "\n"+ message2);
 	}
 
 	/**
