@@ -128,11 +128,13 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			//startline = Integer.parseInt(message2.substring(matcher.end()));
 			message2 = message2.substring(0, matcher.start());
 		}
-		if((message2 == " " || message2 == null) && (message3 == " " || message3 == null))
+		System.out.println(message2);
+		System.out.println(message3);
+		if((message2 == null || message2.equals(" ") || message2.length() == 0) && (message3 == null || message3.equals(" ") || message3.length() == 0))
 			customMessage="\nYour code seems secure to Automatic Security Bug Fixer";
-		else if(message2 == " " || message2 == null)
+		else if (message2 == null || message2.equals(" ") || message2.length() == 0)
 			customMessage="\nResult from GumTree Diff Score\n"+message3;
-		else if(message3 == " " || message3 == null)
+		else if (message3 == null || message3.equals(" ") || message3.length() == 0)
 			customMessage="\nResult from Tokenizer\n"+message2;
 		else
 			customMessage="\nResult from Tokenizer\n"+message2+"\nResult from GumTree Diff Score\n"+message3;
@@ -169,7 +171,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 				setReturnCode(buttonId);
 				if(buttonId==0)
 			    {
-			    		if(!secureCode.equals(" ") || secureCode!=null)
+			    		if(secureCode != null || !secureCode.equals(" ") || secureCode.length() != 0)
 			    		{
 			    			MessageDialog securem = new MessageDialog(window.getShell(), "Security Issue Plugin", null, secureCode, 0, 0, "Cancel");
 				    		securem.open();
