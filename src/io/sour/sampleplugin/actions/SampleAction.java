@@ -138,8 +138,17 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			customMessage="\nResult from Tokenizer\n"+message2;
 		else
 			customMessage="\nResult from Tokenizer\n"+message2+"\nResult from GumTree Diff Score\n"+message3;
-		
-		MessageDialog m = new MessageDialog(window.getShell(), "Security Issue Plugin", null, message+ "\n", 0, MessageDialog.CONFIRM, new String[]{"Preview Secure Code >", "Cancel"}) 
+
+		String[] buttonTexts;
+		boolean secureAvailable = secureCode != null && !secureCode.equals(" ") && secureCode.length() != 0;
+		if (secureAvailable) {
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+			buttonTexts = new String[]{"Preview Secure Code >", "Cancel"};
+		} else {
+			buttonTexts = new String[]{"Cancel"};
+			System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+		}
+		MessageDialog m = new MessageDialog(window.getShell(), "Security Issue Plugin", null, message+ "\n", 0, MessageDialog.CONFIRM, buttonTexts) 
 		{
 			 @Override
 			  protected Control createCustomArea( Composite parent ) {
@@ -169,16 +178,13 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			 protected void buttonPressed(int buttonId) 
 			 {
 				setReturnCode(buttonId);
-				if(buttonId==0)
+				if(secureAvailable && buttonId==0)
 			    {
-			    		if(secureCode != null || !secureCode.equals(" ") || secureCode.length() != 0)
-			    		{
-			    			MessageDialog securem = new MessageDialog(window.getShell(), "Security Issue Plugin", null, secureCode, 0, 0, "Cancel");
-				    		securem.open();
-			    		}
+	    			MessageDialog securem = new MessageDialog(window.getShell(), "Security Issue Plugin", null, secureCode, 0, 0, "Cancel");
+		    		securem.open();
 			    // close(); Call close for Delete or Cancel?
 			    }
-				else if(buttonId==1)
+				else
 				{
 					super.buttonPressed(buttonId);
 				}
