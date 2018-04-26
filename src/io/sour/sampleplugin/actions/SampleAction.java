@@ -4,15 +4,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -47,66 +57,13 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) 
 	{
-		//String message = "&&&&&&&&&&";
-		//String message2 = "##########";
-		//StringBuilder message3 = new StringBuilder();
-		//boolean flag = false;
-		//IEditorPart editor = window.getActivePage().getActiveEditor();
-		//if (editor == null) {
-		//	MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
-		//	return;
-		//}
-	    //ITextEditor ite = (ITextEditor)editor;
-	    //IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
-	    //message = doc.get();
-	    /*if(message.contains("TrustManager"))
-	    {
-	    		message2 = "Found it!!";
-		    Scanner sc = new Scanner(message);
-		    while(sc.hasNextLine())
-		    {
-		      String line = sc.nextLine();
-		      // process the line
-		      if(line.trim().startsWith("TrustManager[]"))
-		      {
-		    	  	flag = true;
-		      }
-		      if(flag == true)
-		      {
-		    	  	message3.append(line);
-		      }
-		      if(line.endsWith("};"))
-		      {
-		    	  	flag = false;
-		      }
-		    }
-		    sc.close();
-	    }
-	    
-	    String message4 = "\n\n^^^$$$$$$$$$$^^^\n\n";
-	    
-	    try {
-			message4 += CodeDatabase.compareSnippet(message3.toString()) ? "DATABASE MATCH" : "NO MATCH FOUND IN DATABASE";
-		} catch (InvalidFormatException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-		//message += "\n" + b;
-		//message += "\n" + c;
-		//message += "\n" + d;
-		MessageDialog.openInformation(
-			window.getShell(),
-			"Sampleplugin",
-			"Hello, Eclipse world" + "\n" + message2+ "\n" + message3 + "\n" + message4);
-		*/
-		// -------------------------EDITED BY DEEPIKA------------------------------
 		
 		File file = new File("/Users/deepikamulchandani/Downloads/Keywords");
 		String code;
 		String keyword;
 		String message = "Welcome to Automatic Security Bug Fix Plugin!";
 		String message2 = " ";
+		String message3 = " ";
 		IEditorPart editor = window.getActivePage().getActiveEditor();
 		if (editor == null) {
 			MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
@@ -126,7 +83,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			    	 try 
 			    	 {
 			    		 	 message2 = CodeDatabase.compareSnippet(code,keyword);
-			    		 	CodeDatabase.compareSnippetAST(code,keyword);
+			    		 	 message3 = CodeDatabase.compareSnippetAST(code,keyword);
 			    	 }
 			    	 catch(InvalidFormatException | IOException e) 
 			    	 {
@@ -142,11 +99,48 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 		{
 			e.printStackTrace();
 		}
-			
-		MessageDialog.openInformation(
-				window.getShell(),
-				"Security Issue Plugin",
-				 message+ "\n"+ message2);
+		final String customMessage;
+		System.out.println(message2);
+		if(message2 == " ")
+			customMessage="\nResult from Tokenizer\n"+message3;
+		else if(message3 == " ")
+			customMessage="\nResult from GumTree Diff Score\n"+message2;
+		else if(message2==" " && message3==" ")
+			customMessage="\nYour code seems secure to Automatic Security Bug Fixer";
+		else
+			customMessage="\nResult from Tokenizer\n"+message2+"\nResult from GumTree Diff Score\n"+message3;
+		
+		
+		MessageDialog m = new MessageDialog(window.getShell(), "Security Issue Plugin", null, message+ "\n", 0, 0,"Okay") {
+			 @Override
+			  protected Control createCustomArea( Composite parent ) {
+			    Link link = new Link( parent, SWT.WRAP );
+			    // link.setText( "Please visit <a href=\"http://google.com\">this link</a>." );
+			    link.setText(customMessage);
+			    link.addSelectionListener(new SelectionAdapter(){
+			    		
+		            public void widgetSelected(SelectionEvent e) {
+		                   System.out.println("You have selected: "+e.text);
+		                   try {
+		                    //  Open default external browser 
+		                    PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL(e.text));
+		                  } 
+		                 catch (PartInitException ex) {
+		                    // TODO Auto-generated catch block
+		                     ex.printStackTrace();
+		                } 
+		                catch (MalformedURLException ex) {
+		                    // TODO Auto-generated catch block
+		                    ex.printStackTrace();
+		                }
+		            }
+		        });
+			    return link;
+			  }
+
+		};
+		m.open();
+		
 	}
 
 	/**
