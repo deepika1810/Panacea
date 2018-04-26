@@ -132,7 +132,7 @@ public class CodeDatabase
             					count++;
             					if(!row_numbers.contains(row.getRowNum()))
             						row_numbers.add(row.getRowNum());
-            					System.out.println("IT WORKS!!!");
+            					//System.out.println("IT WORKS!!!");
             			}
             		}
             }
@@ -168,12 +168,12 @@ public class CodeDatabase
 							
 							if(urlValue!="") 
 							{
-								result.append("The URL of the possible post you possibly referred is <a href=\""+ urlValue + "\">" + urlValue + "</a>\n");
+								result.append("The URL of the possible post you possibly referred is:\n <a href=\""+ urlValue + "\">" + urlValue + "</a>\n");
 							}
 							iter--;
 						}
-						result.append("\nSTART line number"+linestart.get(row.getRowNum()));
-						result.append("\nEND line number"+lineend.get(row.getRowNum()));
+						result.append(" START line number: "+linestart.get(row.getRowNum()));
+						result.append(" END line number: "+lineend.get(row.getRowNum()));
 						Cell secure = row.getCell(noOfColumns-1);
 						String secureValue = dataFormatter.formatCellValue(secure);
 						int secureintvalue = Integer.parseInt(secureValue);
@@ -185,7 +185,7 @@ public class CodeDatabase
 								Row sec_row = sec_sheet.getRow(secureintvalue);
 								Cell secureCode = sec_row.getCell(3);
 								String secureCodeValue = dataFormatter.formatCellValue(secureCode);
-								result.append("\nSECURE FOUND:"+secureCodeValue);
+								result.append(" SECURE FOUND: "+secureCodeValue);
 							}
 						}
 						
@@ -202,6 +202,7 @@ public class CodeDatabase
 	//AST Difference
 		public static String compareSnippetAST(String sourceSnippet,String keyword) throws IOException , InvalidFormatException
 		{
+			iter = 0;
 			Workbook workbook = WorkbookFactory.create(new File(insecure_posts));
 			Sheet sheet = workbook.getSheetAt(0);
 			DataFormatter dataFormatter = new DataFormatter();
@@ -377,7 +378,9 @@ public class CodeDatabase
 						});
 				}
 			}
+			//System.out.println(result.toString());
 			return result.toString();
+	
 		}
 	
 		public static String FindFile(String filename) 

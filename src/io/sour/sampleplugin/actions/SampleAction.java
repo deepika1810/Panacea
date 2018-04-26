@@ -17,6 +17,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -32,6 +33,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -43,6 +46,7 @@ import java.util.*;
  */
 public class SampleAction implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow window;
+	String secureCode=" ";
 	/**
 	 * The constructor.
 	 */
@@ -100,18 +104,41 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			e.printStackTrace();
 		}
 		final String customMessage;
-		System.out.println(message2);
-		if(message2 == " ")
-			customMessage="\nResult from Tokenizer\n"+message3;
-		else if(message3 == " ")
-			customMessage="\nResult from GumTree Diff Score\n"+message2;
-		else if(message2==" " && message3==" ")
+		
+		int startline=0;
+		int endline=0;
+		Pattern pattern = Pattern.compile("SECURE FOUND: *");
+		Matcher matcher = pattern.matcher(message2);
+		if (matcher.find()) 
+		{
+			secureCode = message2.substring(matcher.end());
+			message2 = message2.substring(0, matcher.start());	
+		}
+		pattern = Pattern.compile("END line number: *");
+		matcher = pattern.matcher(message2);
+		if(matcher.find())
+		{
+			//endline = Integer.parseInt(message2.substring(matcher.end()));
+			message2 = message2.substring(0, matcher.start());
+		}
+		pattern = Pattern.compile("START line number: *");
+		matcher = pattern.matcher(message2);
+		if(matcher.find())
+		{
+			//startline = Integer.parseInt(message2.substring(matcher.end()));
+			message2 = message2.substring(0, matcher.start());
+		}
+		if((message2 == " " || message2 == null) && (message3 == " " || message3 == null))
 			customMessage="\nYour code seems secure to Automatic Security Bug Fixer";
+		else if(message2 == " " || message2 == null)
+			customMessage="\nResult from GumTree Diff Score\n"+message3;
+		else if(message3 == " " || message3 == null)
+			customMessage="\nResult from Tokenizer\n"+message2;
 		else
 			customMessage="\nResult from Tokenizer\n"+message2+"\nResult from GumTree Diff Score\n"+message3;
 		
-		
-		MessageDialog m = new MessageDialog(window.getShell(), "Security Issue Plugin", null, message+ "\n", 0, 0,"Okay") {
+		MessageDialog m = new MessageDialog(window.getShell(), "Security Issue Plugin", null, message+ "\n", 0, MessageDialog.CONFIRM, new String[]{"Preview Secure Code >", "Cancel"}) 
+		{
 			 @Override
 			  protected Control createCustomArea( Composite parent ) {
 			    Link link = new Link( parent, SWT.WRAP );
@@ -136,12 +163,29 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 		            }
 		        });
 			    return link;
-			  }
-
+			 }
+			 protected void buttonPressed(int buttonId) 
+			 {
+				setReturnCode(buttonId);
+				if(buttonId==0)
+			    {
+			    		if(!secureCode.equals(" ") || secureCode!=null)
+			    		{
+			    			MessageDialog securem = new MessageDialog(window.getShell(), "Security Issue Plugin", null, secureCode, 0, 0, "Cancel");
+				    		securem.open();
+			    		}
+			    // close(); Call close for Delete or Cancel?
+			    }
+				else if(buttonId==1)
+				{
+					super.buttonPressed(buttonId);
+				}
+			 }	
 		};
 		m.open();
 		
 	}
+	
 
 	/**
 	 * Selection in the workbench has been changed. We 
