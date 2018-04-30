@@ -221,7 +221,8 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			    IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
 
 		    	int startOffset = doc.getLineOffset(startLine - 1);
-		    	int endOffset = doc.getLineOffset(endLine - 2) + doc.getLineLength(endLine - 2);
+		    	int actualEndLine = Math.min(doc.getNumberOfLines() - 1, endLine - 2);
+		    	int endOffset = doc.getLineOffset(actualEndLine) + doc.getLineLength(actualEndLine);
 		    	System.out.println("Start: " + startOffset + "\nEnd: " + endOffset);
 		    	ite.setHighlightRange(startOffset, endOffset - startOffset, true);
 		    	ite.selectAndReveal(startOffset, endOffset - startOffset);
