@@ -215,9 +215,22 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 				marker = res.createMarker(IMarker.PROBLEM);
 				marker.setAttribute(IMarker.MESSAGE, message2);
 				marker.setAttribute(IMarker.LINE_NUMBER, startLine);
+				
+
+				ITextEditor ite = (ITextEditor)editor;
+			    IDocument doc = ite.getDocumentProvider().getDocument(ite.getEditorInput());
+
+		    	int startOffset = doc.getLineOffset(startLine - 1);
+		    	int endOffset = doc.getLineOffset(endLine - 2) + doc.getLineLength(endLine - 2);
+		    	System.out.println("Start: " + startOffset + "\nEnd: " + endOffset);
+		    	ite.setHighlightRange(startOffset, endOffset - startOffset, true);
+		    	ite.selectAndReveal(startOffset, endOffset - startOffset);
 			} catch (CoreException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
