@@ -174,6 +174,7 @@ public class CodeDatabase
 						}
 						result.append(" START line number: "+linestart.get(row.getRowNum()));
 						result.append(" END line number: "+lineend.get(row.getRowNum()));
+						result.append("##^##");
 						Cell secure = row.getCell(noOfColumns-1);
 						String secureValue = dataFormatter.formatCellValue(secure);
 						int secureintvalue = Integer.parseInt(secureValue);

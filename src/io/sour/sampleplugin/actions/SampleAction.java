@@ -9,6 +9,9 @@ import java.net.URL;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -30,6 +33,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import io.sour.sampleplugin.database.CodeDatabase;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
 import java.util.*;
@@ -73,7 +77,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			MessageDialog.openError(window.getShell(), "Sample Plugin", "No file open to check.");
 			return;
 		}
-		try 
+		try
 		{
 			Scanner sc = new Scanner(file);
 			while(sc.hasNextLine())
@@ -84,7 +88,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			    code = doc.get();
 			    if(code.contains(keyword))
 			    {
-			    	 try 
+			    	 try
 			    	 {
 			    		 	 message2 = CodeDatabase.compareSnippet(code,keyword);
 			    		 	 message3 = CodeDatabase.compareSnippetAST(code,keyword);
@@ -118,18 +122,24 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 		matcher = pattern.matcher(message2);
 		if(matcher.find())
 		{
-			//endline = Integer.parseInt(message2.substring(matcher.end()));
+			int endIndex = message2.indexOf("##^##");
+			String endString = message2.substring(matcher.end(), endIndex);
+			System.out.println("end:" + endString);
+			endString = endString.replaceAll("[^0-9]", "");
+			endline = Integer.parseInt(endString);
 			message2 = message2.substring(0, matcher.start());
 		}
 		pattern = Pattern.compile("START line number: *");
 		matcher = pattern.matcher(message2);
 		if(matcher.find())
 		{
-			//startline = Integer.parseInt(message2.substring(matcher.end()));
+			String startString = message2.substring(matcher.end());
+			startString = startString.replaceAll("[^0-9]", "");
+			startline = Integer.parseInt(startString);
 			message2 = message2.substring(0, matcher.start());
 		}
-		System.out.println(message2);
-		System.out.println(message3);
+		System.out.println("START: " + startline);
+		System.out.println("END: " + endline);
 		if((message2 == null || message2.equals(" ") || message2.length() == 0) && (message3 == null || message3.equals(" ") || message3.length() == 0))
 			customMessage="\nYour code seems secure to Automatic Security Bug Fixer";
 		else if (message2 == null || message2.equals(" ") || message2.length() == 0)
@@ -191,7 +201,25 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 			 }	
 		};
 		m.open();
+		createMarkerForEditor(editor, startline, endline, message2);
 		
+	}
+	
+	public static void createMarkerForEditor(IEditorPart editor, int startLine, int endLine, String message2) {
+		if (startLine > 0) {
+			IFile res = ((FileEditorInput) editor.getEditorInput()).getFile();
+			System.out.println(res.getName());
+			IMarker marker;
+			try {
+				res.deleteMarkers(IMarker.PROBLEM, false, IFile.DEPTH_ZERO);
+				marker = res.createMarker(IMarker.PROBLEM);
+				marker.setAttribute(IMarker.MESSAGE, message2);
+				marker.setAttribute(IMarker.LINE_NUMBER, startLine);
+			} catch (CoreException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 
