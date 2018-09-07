@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.Scanner;
 public class CodeDatabase 
 {
-	 public static final String insecure_posts = "/Users/deepikamulchandani/Downloads/InsecurePosts4.xls";
-	 public static final String secure_posts = "/Users/deepikamulchandani/Downloads/SecurePosts.xls";
+	 public static final String insecure_posts = "C:/Users/Sourabh/Desktop/SE/InsecurePosts4.xls";
+	 public static final String secure_posts = "C:/Users/Sourabh/Desktop/SE/SecurePosts.xls";
 	 public static int count = 0;
 	 public static int countAST =0;
 	 public static int iter = 0;
@@ -282,7 +282,7 @@ public class CodeDatabase
 	    		{
 				for( Integer i:row_code.keySet())
 				{
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File("/Users/deepikamulchandani/Downloads/DevCode"+i+".java")));
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File("C:/Users/Sourabh/Desktop/SE/DevCode"+i+".java")));
 					writer.write(row_code.get(i).toString());
 					writer.close();
 				}
@@ -310,7 +310,7 @@ public class CodeDatabase
 					    BufferedReader is;
 					    try 
 					    {
-							p = r.exec("/Users/deepikamulchandani/gumtree/dist/build/distributions/gumtree/bin/gumtree diff /Users/deepikamulchandani/Downloads/answers/"+filename+" /Users/deepikamulchandani/Downloads/DevCode"+row.getRowNum()+".java");
+							p = r.exec("C:/gumtree/bin/gumtree.bat diff C:/Users/Sourabh/Desktop/SE/answers/"+filename+" C:/Users/Sourabh/Desktop/SE/DevCode/DevCode"+row.getRowNum()+".java");
 							is = new BufferedReader(new InputStreamReader(p.getInputStream()));
 							while ((output = is.readLine()) != null)
 							{
@@ -386,7 +386,7 @@ public class CodeDatabase
 	
 		public static String FindFile(String filename) 
 		{
-			File folder = new File("/Users/deepikamulchandani/Downloads/answers/");
+			File folder = new File("C:/Users/Sourabh/Desktop/SE/answers/");
 			File[] listOfFiles = folder.listFiles();
 			String result = "null";
 			 for (int i = 0; i < listOfFiles.length; i++) 

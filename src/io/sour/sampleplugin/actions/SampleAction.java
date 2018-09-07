@@ -66,7 +66,7 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	public void run(IAction action) 
 	{
 		
-		File file = new File("/Users/deepikamulchandani/Downloads/Keywords");
+		File file = new File("C:/Users/Sourabh/Desktop/SE/Keywords");
 		String code;
 		String keyword;
 		String message = "Welcome to Automatic Security Bug Fix Plugin!";
